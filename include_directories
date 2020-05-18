@@ -1,9 +1,0 @@
-#ifndef INCLUDE_GUARD
-#define INCLUDE_GUARD
-
-#define GAME_PROJECT_NAME "Game_of_Life"
-#define GAME_VERSION_MAJOR 0
-#define GAME_VERSION_MINOR 1
-#define CONFIG_DIRECTORY "/home/andre/Workspace/Game_of_Life/build/configs"
-
-#endif // INCLUDE_GUARD
