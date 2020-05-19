@@ -48,7 +48,7 @@ include_directories(include
                     ${CMAKE_HEADERS_OUTPUT_DIRECTORY})
 
 # %%%%%%% Executable %%%%%%%
-add_executable(${PROJECT_NAME} src/main.cpp )
+add_executable(${PROJECT_NAME} src/main.cpp src/visual2d.cpp )
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 target_link_libraries(${PROJECT_NAME}

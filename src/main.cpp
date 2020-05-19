@@ -4,8 +4,10 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
-#include "readConfig.hpp"
 #include "cmake_config.h"
+#include "readConfig.hpp"
+#include "visual2d.hpp"
+
 
 using namespace std;
 
@@ -21,13 +23,15 @@ int main (int argc, char *argv[])
 	// Read the configuration file and get the parameter.
 	GameOfLife::ReadConfig read_config(help_string);
 
-        int number_of_boxes = 0;
+        int number_of_elements = 100;
+        std::string window_form = "square";
 
-        read_config.get_parameter("number_of_boxes", number_of_boxes);
-/*
+        read_config.get_parameter("number_of_elements", number_of_elements);
+        read_config.get_parameter("window_form", window_form);
+
 	// Starting the 2D visualization.
-	GameOfLife::Visual2D visualization();
-
+	GameOfLife::Visual2D visualization(number_of_elements, window_form);
+/*
 	// Frequency control and execution time calculation.
 	// Parameter. This will go into the configuration file later.
 	int averge_depth_exe = 10;
