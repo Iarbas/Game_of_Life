@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h> 
 #include "visual2d.hpp"
 
 namespace GameOfLife
@@ -32,7 +33,7 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
     // Get screen resolution.
     sf::VideoMode desktop = sf::VideoMode().getDesktopMode();
     
-    fprintf(stdout,"Create a %s window.\n", window_form.c_str());
+    fprintf(stdout,"Create window as a %s.\n", window_form.c_str());
     
     // Declare variables
     int element_size = 3;   // 3 is minimum.
@@ -154,9 +155,16 @@ inline int Visual2D::max_num_of_elem (int num_of_elem, int a, int b)
 
 inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
 {
-    int element_size, big_side, help4_row_element, help5_column_element;
+    int element_size, big_side, big_side_original;
+    
+    int help4_row_element, help5_column_element;
+    
     int help6_total_elements; 
+    
     float help1_big_element_size, help2_ratio, help3_small_element_size;
+    
+    int best_element_size, best_help4_row_element, best_help5_column_element;
+    int best_help6_total_elements = 0;
 
     // Get the size of each element by the size of the window. We use the muliplicatior 0.95,
     // because of the Panel/Dock from the Ubuntu screen.
@@ -172,15 +180,32 @@ inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
         big_side = b;
     }
     
+    big_side_original = big_side;
+    
     // Create a loop which will adjust the size of the window with respect to the required 
     // number of elements (less than 10% of tolerance). We run the loop with respect to 10%
     // of the biggest side.
-    for (int i = 0; i <= (0.3 * big_side); i++ ) 
+    // TODO: Tolerances in the config file.
+    for (int i = 0; i <= (0.1 * big_side_original); i++ ) 
     {
-        a--;
-        b--;
-        big_side--;
-    
+        if (a == b)
+        {
+            a--;
+            b--;
+            big_side--;        
+        }
+        else if (a >= b)
+        {
+            a--;
+            big_side--;
+        }
+        else
+        {
+            b--;
+            big_side--;        
+        }
+
+        // Special algorithm for distributing multiple boxes with fixed size inside bigger box.
         help1_big_element_size = (float) (big_side) / sqrt( num_of_elem);
     
         help2_ratio = (a * b) / (big_side * big_side);
@@ -193,36 +218,49 @@ inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
         help5_column_element = (int) (b / element_size);
         
         help6_total_elements = help4_row_element * help5_column_element;
+        
+        if (abs(help6_total_elements - num_of_elem) < abs(best_help6_total_elements - num_of_elem))
+        {
+            best_element_size = element_size;
+            best_help4_row_element = help4_row_element;
+            best_help5_column_element = help5_column_element;
+            best_help6_total_elements = help6_total_elements;        
+        }
+        
+        fprintf(stdout,"%i \t %i \t %i\n", big_side, help6_total_elements, best_help6_total_elements);
     
-        if (help6_total_elements < (num_of_elem + 0.1) && help6_total_elements > (num_of_elem - 0.1))
+        // If the number of elements fit inside the tolerance of the requested number, the loop will stop.
+        // TODO: Tolerances in the config file.
+        if (help6_total_elements < (1.1 * num_of_elem) && help6_total_elements > (0.9 * num_of_elem))
         {
             break;
         }
     }
         
     // Control of the 
-    if (element_size < 3)
+    // TODO: Tolerances in the config file.
+    if (best_element_size < 3)
     {
-        element_size = 3;
+        best_element_size = 3;
     
         fprintf(stdout,"Something totally went wrong. Set the element size to the minimum of 9 pixel.\n");
     }
     
-    fprintf(stdout,"The edge length of one element was calculated to %i pixel on each side.\n", element_size);
-    fprintf(stdout,"There are %i elements in the row and %i in the column. ", help4_row_element, 
-                help5_column_element); 
+    fprintf(stdout,"The edge length of one element was calculated to %i pixel on each side.\n", best_element_size);
+    fprintf(stdout,"There are %i elements in the row and %i in the column. ", best_help4_row_element, 
+                best_help5_column_element); 
             
     fprintf(stdout,"In total there are %i elements in the simulation from the requested %i.\n", 
-                help6_total_elements, num_of_elem);
+                best_help6_total_elements, num_of_elem);
                 
     // Calculate the resulting window size
-    Visual2D::screen_height = help4_row_element * element_size;
-    Visual2D::screen_width = help5_column_element * element_size;
+    Visual2D::screen_height = best_help4_row_element * best_element_size;
+    Visual2D::screen_width = best_help5_column_element * best_element_size;
     
     fprintf(stdout,"The height from the window is %i and the width is %i.\n", Visual2D::screen_height, 
                 Visual2D::screen_width);
         
-    return element_size;
+    return best_element_size;
 }
 
 }
