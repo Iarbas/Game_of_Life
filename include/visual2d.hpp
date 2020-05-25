@@ -55,6 +55,9 @@ private:
 
 	uint32_t screen_height;
 	uint32_t screen_width;
+	
+	uint32_t grid_height;
+	uint32_t grid_width;
 
 	sf::Event event;
 	sf::Texture* dead_box;
