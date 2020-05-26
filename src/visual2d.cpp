@@ -47,11 +47,12 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
     {
         // Compare the resolution in a lookup table.
         for (int i = 0; i < sizeof common_screen_res / sizeof common_screen_res[0]; i++)
-        {
+        {      
             // If we find the resolution in our list, we do not have to to anything.
             if (desktop.height == common_screen_res[i][1] && desktop.width == common_screen_res[i][0])
             {
                 found = true;
+                factor = 1.0f;
                 break;
             }
             else if (desktop.height == common_screen_res[i][1])
@@ -78,6 +79,7 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
             if (desktop.width == common_screen_res[i][0] && desktop.height == common_screen_res[i][1])
             {
                 found = true;
+                factor = 1.0f;
                 break;
             }
             else if (desktop.width == common_screen_res[i][0])
@@ -95,7 +97,7 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
             }
         }     
     }
-    
+        
     // Check, if we have the right window size.
     if (found && factor == 1)
     {
@@ -119,7 +121,7 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
     Visual2D::screen_height = 0.95f * desktop.height;
     Visual2D::screen_width = 0.95f * desktop.width;
     
-    fprintf(stdout,"Window size will be: %i \t %i (WxH).\n", Visual2D::screen_width, Visual2D::screen_height);
+    fprintf(stdout,"Window size will be: %i x %i (W x H).\n", Visual2D::screen_width, Visual2D::screen_height);
 	
     // Adapt the window to the request form and number of elements.
     if (window_form.compare("square") == 0)
@@ -160,7 +162,7 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
     }
 
     sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
+    settings.antialiasingLevel = 4;
 
     Visual2D::window = new sf::RenderWindow(sf::VideoMode(Visual2D::screen_width, Visual2D::screen_height), "Game_of_Life", sf::Style::Close, settings);
     Visual2D::biotope = new sf::Texture;
@@ -169,26 +171,9 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
     
     Visual2D::window->setPosition(sf::Vector2i(0.5 * (desktop.width - Visual2D::screen_width), 0.5 * (desktop.height - Visual2D::screen_height)));
 	
-    // At first I will try with pixel and then with shapes.
-        
-    // Pixel method.	
-    // Assign colors to the textures.
-    /*if (!biotope->create(Visual2D::screen_height, Visual2D::screen_width))
-    {
-        fprintf(stdout,"Cannot create the biotope. Stopping the program...\n");
-        std::exit(0);
-    }    
-    else
-    {
-        fprintf(stdout,"Opening a window and draw the biotope.\n");
-        
-
-        sf::Uint8* pixels = new sf::Uint8[width * height * 4];
-        
-        biotope->update(rect);
-    }*/
+    // Draw the whole scenery. (https://www.sfml-dev.org/tutorials/2.5/graphics-vertex-array.php)
     
-    // Shape method.
+    // Draw the background
     Visual2D::background = new sf::RectangleShape;
     background->setSize(sf::Vector2f(Visual2D::screen_width, Visual2D::screen_height));
     background->setPosition(sf::Vector2f(0.f, 0.f));
