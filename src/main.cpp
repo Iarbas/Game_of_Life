@@ -31,7 +31,7 @@ int main (int argc, char *argv[])
 
 	// Starting the 2D visualization.
 	GameOfLife::Visual2D visualization(number_of_elements, window_form);
-/*
+
 	// Frequency control and execution time calculation.
 	// Parameter. This will go into the configuration file later.
 	int averge_depth_exe = 10;
@@ -118,7 +118,7 @@ int main (int argc, char *argv[])
 		{
 			iter_fps_calc++;
 		}
-	}*/
+	}
 
 	return 0;
 }

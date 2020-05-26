@@ -60,9 +60,37 @@ private:
 	uint32_t grid_width;
 
 	sf::Event event;
-	sf::Texture* dead_box;
-	sf::Texture* live_box;
+	sf::Texture* biotope;
+	sf::RectangleShape* background;
+	
+        // Lookup table for common screen resolution (https://en.wikipedia.org/wiki/Display_resolution).
+        // Because of not unique values, we cannot use "std::map" or "std::unordered_map" here.
+        // Schema: {Width, Height}
+	static int constexpr common_screen_res[19][2] =
+	{
+	{640, 360},
+	{800, 600},
+	{1024, 768},
+	{1280, 720},
+	{1280, 800},
+	{1280, 1024},
+	{1360, 768},
+	{1366, 768},
+	{1440, 900},
+	{1536, 864},
+	{1600, 900},
+	{1680, 1050},
+	{1920, 1080},
+	{1920, 1200},
+	{2048, 1152},
+	{2560, 1080},
+	{2560, 1440},
+	{3440, 1440},
+	{3840, 2160}
+        };
 };
+
 }
+
 
 #endif // HEADER_VISUAL2D_HPP_AP_19052020

@@ -38,9 +38,88 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
     // Declare variables
     int element_size = 3;   // 3 is minimum.
     
+    // In case of a dual / tripple or even more monitor system, we only want to see the window on the first screen. 
+    bool found = false;
+    float factor = 1.0f;
+    
+    // Here the monitors are alongside...
+    if (desktop.height <= desktop.width)
+    {
+        // Compare the resolution in a lookup table.
+        for (int i = 0; i < sizeof common_screen_res / sizeof common_screen_res[0]; i++)
+        {
+            // If we find the resolution in our list, we do not have to to anything.
+            if (desktop.height == common_screen_res[i][1] && desktop.width == common_screen_res[i][0])
+            {
+                found = true;
+                break;
+            }
+            else if (desktop.height == common_screen_res[i][1])
+            {
+                factor = (float) (desktop.width) / (float) (common_screen_res[i][0]);
+                                
+                if (factor == (int) factor)
+                {
+                    // If we look in the table we will see, that there are some values not unique. 
+                    // So, if we find a interger factor, we will have the right screen size.
+                    found = true;
+                    desktop.width = desktop.width / factor;
+                    break;
+                }
+            }
+        }        
+    }
+    // ... here there are on top of each other.
+    else
+    {
+        for (int i = 0; i < sizeof common_screen_res / sizeof common_screen_res[0]; i++)
+        {
+            // If we find the resolution in our list, we do not have to to anything.
+            if (desktop.width == common_screen_res[i][0] && desktop.height == common_screen_res[i][1])
+            {
+                found = true;
+                break;
+            }
+            else if (desktop.width == common_screen_res[i][0])
+            {
+                factor = (float) (desktop.height) / (float) (common_screen_res[i][1]);
+                
+                if (factor == (int) factor)
+                {
+                    // If we look in the table we will see, that there are some values not unique. 
+                    // So, if we find a interger factor, we will have the right screen size.
+                    found = true;
+                    desktop.height = desktop.height / factor;
+                    break;
+                }
+            }
+        }     
+    }
+    
+    // Check, if we have the right window size.
+    if (found && factor == 1)
+    {
+        fprintf(stdout,"Single monitor system detected, no changes to the resolution.\n");
+    }
+    else if (found)
+    {
+        fprintf(stdout,"Multiple monitor system detected, adapt the window size to only one screen.\n");
+    }
+    else
+    {
+        fprintf(stdout,"\n\n+++++++++++ Something went wrong +++++++++++\n");
+        fprintf(stdout,"Couldn't find the right resolution for your screen.\n");
+        fprintf(stdout,"Height: %i \t and Width: %i\n", desktop.height, desktop.width);        
+        fprintf(stdout,"Please send this to me with the corresponding config file.\n\n");    
+        std::exit(0); 
+    }
+    
+    
     // We use the muliplicatior 0.95, because of the Panel/Dock from the Ubuntu screen.
     Visual2D::screen_height = 0.95f * desktop.height;
     Visual2D::screen_width = 0.95f * desktop.width;
+    
+    fprintf(stdout,"Window size will be: %i \t %i (WxH).\n", Visual2D::screen_width, Visual2D::screen_height);
 	
     // Adapt the window to the request form and number of elements.
     if (window_form.compare("square") == 0)
@@ -80,15 +159,42 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
         fprintf(stdout,"No form with the name %s exists. You should exit the program.\n", window_form.c_str());
     }
 
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
 
-    // Visual2D::window = new sf::RenderWindow(desktop, "Game_of_Life");
-    // Visual2D::dead_box = new sf::Texture;
-    // Visual2D::live_box = new sf::Texture;
+    Visual2D::window = new sf::RenderWindow(sf::VideoMode(Visual2D::screen_width, Visual2D::screen_height), "Game_of_Life", sf::Style::Close, settings);
+    Visual2D::biotope = new sf::Texture;
+    
+    fprintf(stdout,"%i %i %i %i.\n", desktop.width, desktop.height, Visual2D::screen_width, Visual2D::screen_height);
+    
+    Visual2D::window->setPosition(sf::Vector2i(0.5 * (desktop.width - Visual2D::screen_width), 0.5 * (desktop.height - Visual2D::screen_height)));
 	
+    // At first I will try with pixel and then with shapes.
+        
+    // Pixel method.	
     // Assign colors to the textures.
-    // if (!dead_box->create(30,30))
+    /*if (!biotope->create(Visual2D::screen_height, Visual2D::screen_width))
+    {
+        fprintf(stdout,"Cannot create the biotope. Stopping the program...\n");
+        std::exit(0);
+    }    
+    else
+    {
+        fprintf(stdout,"Opening a window and draw the biotope.\n");
+        
 
-    // this->Init();
+        sf::Uint8* pixels = new sf::Uint8[width * height * 4];
+        
+        biotope->update(rect);
+    }*/
+    
+    // Shape method.
+    Visual2D::background = new sf::RectangleShape;
+    background->setSize(sf::Vector2f(Visual2D::screen_width, Visual2D::screen_height));
+    background->setPosition(sf::Vector2f(0.f, 0.f));
+    background->setFillColor(sf::Color(128,128,128)); // grey background
+
+    this->Init();
 }
 
 /** @fn Visual2D::~Visual2D()
@@ -98,10 +204,8 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
  */
 Visual2D::~Visual2D()
 {
-    /*delete Visual2D::window;
-    delete Visual2D::dead_box;
-    delete Visual2D::live_box;
-*/
+    delete Visual2D::window;
+    delete Visual2D::biotope;
 }
 
 /** @fn Visual2D::Init()
@@ -112,11 +216,10 @@ Visual2D::~Visual2D()
 void Visual2D::Init()
 {
     // Create the initial state.
-    
-
-    // Visual2D::window->clear();
-    // Visual2D::window->draw();
-    // Visual2D::window->display();
+    Visual2D::window->clear();
+    // Visual2D::window->draw(*Visual2D::biotope);
+    Visual2D::window->draw(*background);
+    Visual2D::window->display();
 }
 
 /** @fn Visual2D::WindowUpdater()
@@ -126,7 +229,6 @@ void Visual2D::Init()
  */
 void Visual2D::WindowUpdater()
 {
-	/*
 	if (Visual2D::window->isOpen())
 	{
 		if (Visual2D::window->pollEvent(Visual2D::event))
@@ -136,11 +238,11 @@ void Visual2D::WindowUpdater()
 		else
 		{
 			Visual2D::window->clear();
-			Visual2D::window->draw(*Visual2D::sprite_street);
+			// Visual2D::window->draw(*Visual2D::biotope);
+			Visual2D::window->draw(*background);
 			Visual2D::window->display();
 		}
 	}
-	*/
 }
 
 /** @fn Visual2D::max_num_of_elem(int num_of_elem, int a, int b)
@@ -171,7 +273,7 @@ inline int Visual2D::max_num_of_elem (int num_of_elem, int a, int b)
 inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
 {
     fprintf(stdout,"\n\n---------- Calculation of the Grid Size ----------\n");
-    
+       
     // Variable Definition.
     int element_size = 0;
     int row_elements = 0; 
@@ -183,10 +285,11 @@ inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
     int b_adjusted = 0.95f * b;
     
     // Calculate ratio of the screen resolution.
-    int ratio = b_adjusted / a_adjusted;
+    float ratio = (float) (b_adjusted) / (float) (a_adjusted);
     
     // Distribute the elements according to the ratio of the screen.
-    int x = sqrt(num_of_elem / ratio); // x * ratio = y | x * y = num_of_elem
+            
+    int x = sqrt((float) (num_of_elem) / ratio); // x * ratio = y | x * y = num_of_elem
     int y = num_of_elem / x;
     total_elements = y * x;
     
@@ -202,7 +305,8 @@ inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
         fprintf(stdout,"\n\n+++++++++++ Something went wrong +++++++++++\n");
         fprintf(stdout,"Difference of the element size in a and b: %.3f\n", diff);
         fprintf(stdout,"Element size a: %i \t and b: %i\n", element_size_a, element_size_b);        
-        fprintf(stdout,"Please send this to the developer with the corresponding config file.\n\n");        
+        fprintf(stdout,"Please send this to me with the corresponding config file.\n\n");    
+        std::exit(0);    
     }
     else
     {
@@ -254,5 +358,6 @@ inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
         
     return element_size;
 }
+
 
 }
