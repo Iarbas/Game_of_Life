@@ -50,18 +50,34 @@ private:
 	   *  This object represents the user interface to the program.
 	   */
 	void Init();
+	void WindowConfigurator();
+	void GridConfigurator();
+	void BiotopeConfigurator();
+	
 	inline int max_num_of_elem (int num_of_elem, int a, int b);
 	inline int get_element_size (int num_of_elem, int a, int b);
 
-	uint32_t screen_height;
-	uint32_t screen_width;
+	uint32_t window_height;
+	uint32_t window_width;
 	
 	uint32_t grid_height;
 	uint32_t grid_width;
+	
+	int _total_elements;
+	int _number_of_elements;
+	
+        int _row_elements; 
+        int _column_elements;
+	
+	int _element_size;
+	
+	std::string _window_form;
+
+        sf::VideoMode desktop;
 
 	sf::Event event;
-	sf::Texture* biotope;
 	sf::RectangleShape* background;
+	sf::VertexArray biotope_map;
 	
         // Lookup table for common screen resolution (https://en.wikipedia.org/wiki/Display_resolution).
         // Because of not unique values, we cannot use "std::map" or "std::unordered_map" here.
