@@ -7,6 +7,7 @@
 #include "cmake_config.h"
 #include "readConfig.hpp"
 #include "visual2d.hpp"
+#include "lifeCycle.hpp"
 
 
 using namespace std;
@@ -16,8 +17,9 @@ int main (int argc, char *argv[])
 	// Output of the program version.
 	fprintf(stdout,"%s -- Version %d.%d\n", GAME_PROJECT_NAME, GAME_VERSION_MAJOR, GAME_VERSION_MINOR);
 
-        // Path to the configuration file.
-        std::string help_string = CONFIG_DIRECTORY;    // CONFIG_DIRECTORY - Variable from the CMakeLists.txt in the main project folder.
+        // Path to the configuration file. CONFIG_DIRECTORY - Variable from the CMakeLists.txt in the main project 
+        // folder.
+        std::string help_string = CONFIG_DIRECTORY;    
         help_string.append("/sim.config");
 
 	// Read the configuration file and get the parameter.
@@ -31,13 +33,17 @@ int main (int argc, char *argv[])
 
 	// Starting the 2D visualization.
 	GameOfLife::Visual2D visualization(number_of_elements, window_form);
+	
+	// Start the Cycle of Life.
+        GameOfLife::LifeCycle lifecycle(visualization.rows, visualization.columns, 
+                                        visualization.res_num_elements, "random", " ");
 
 	// Frequency control and execution time calculation.
 	// Parameter. This will go into the configuration file later.
 	int averge_depth_exe = 10;
 	int averge_depth_fps = 10;
 
-	float freqyency = 60;
+	float freqyency = 2;
 	int fps_in_us = (int) round(1000000.0 / freqyency);
 
 	std::chrono::time_point<std::chrono::system_clock> fps_counter_start, fps_counter_end, execution_time_start;
@@ -62,7 +68,11 @@ int main (int argc, char *argv[])
 		fps_counter_start = std::chrono::system_clock::now();
 		execution_time_start = std::chrono::high_resolution_clock::now();
 
+               // Each iteration is one life cycle.
+               lifecycle.LifeRules();
+
 		// Re-draw the scenery.
+		visualization.GridUpdater(lifecycle.individuals);
 		visualization.WindowUpdater();
 
 		// Calculation of the execution time average.

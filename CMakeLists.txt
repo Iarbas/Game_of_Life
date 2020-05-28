@@ -14,6 +14,7 @@ set(CMAKE_HEADERS_OUTPUT_DIRECTORY ${PARENT_DIR}/build/lib/include)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PARENT_DIR}/build/bin)
 
 # C++ options.
+set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_REQUIRED_FLAGS -std=c++17 -lstdc++fs)
@@ -48,7 +49,7 @@ include_directories(include
                     ${CMAKE_HEADERS_OUTPUT_DIRECTORY})
 
 # %%%%%%% Executable %%%%%%%
-add_executable(${PROJECT_NAME} src/main.cpp src/visual2d.cpp )
+add_executable(${PROJECT_NAME} src/main.cpp src/visual2d.cpp src/lifeCycle.cpp )
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 target_link_libraries(${PROJECT_NAME}

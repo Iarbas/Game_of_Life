@@ -19,6 +19,10 @@
 #define HEADER_VISUAL2D_HPP_AP_19052020
 
 #include <SFML/Graphics.hpp>
+#include <string>
+#include <vector>
+
+#include "lifeCycle.hpp"
 
 
 namespace GameOfLife
@@ -31,10 +35,11 @@ namespace GameOfLife
 class Visual2D
 {
 public:
-	Visual2D(int number_of_elements, std::string window_form);
-	virtual ~Visual2D();				// Virtual Destructor.
+        Visual2D(int number_of_elements, std::string window_form);
+        virtual ~Visual2D();				// Virtual Destructor.
 
-	void WindowUpdater();
+        void WindowUpdater();
+        void GridUpdater(std::vector<struct_individuals> &individuals);
 
 	/** @var sf::RenderWindow* window
 	   *  @brief Object of the open window.
@@ -42,6 +47,11 @@ public:
 	   *  This object represents the visual output of the class.
 	   */
 	sf::RenderWindow* window;
+	
+	// The resultant number of elements, because of the limitation of the window size.
+	int res_num_elements;
+	int rows; 
+        int columns;
 
 private:
 	/** @var sf::Event event
@@ -63,11 +73,7 @@ private:
 	uint32_t grid_height;
 	uint32_t grid_width;
 	
-	int _total_elements;
 	int _number_of_elements;
-	
-        int _row_elements; 
-        int _column_elements;
 	
 	int _element_size;
 	

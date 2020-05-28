@@ -26,19 +26,19 @@ namespace GameOfLife
 /** @fn Visual2D::Visual2D()
  *  @brief Constructor of the class Visual2D.
  *
- *  Initialization of the window object.
  */
 Visual2D::Visual2D(int number_of_elements, std::string window_form)
 {
     // Initialize variables
-    _total_elements = 0;
+    res_num_elements = 0;
     this->_window_form = window_form;
     this->_number_of_elements = number_of_elements;
     this->_element_size = 3;   // 3 is the minimum. TODO: in config file
-    this->_row_elements = 0; 
-    this->_column_elements = 0;
+    this->rows = 0; 
+    this->columns = 0;
     
-    // Create the background
+    // Create the window and background
+    Visual2D::window = new sf::RenderWindow;
     Visual2D::background = new sf::RectangleShape;
     
     // Get screen resolution.
@@ -55,6 +55,7 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
 Visual2D::~Visual2D()
 {
     delete Visual2D::window;
+    delete Visual2D::background;
 }
 
 /** @fn Visual2D::Init()
@@ -87,20 +88,23 @@ void Visual2D::Init()
  */
 void Visual2D::WindowUpdater()
 {
-	if (Visual2D::window->isOpen())
-	{
-		if (Visual2D::window->pollEvent(Visual2D::event))
-		{
-			if (Visual2D::event.type == sf::Event::Closed) Visual2D::window->close();
-		}
-		else
-		{
-			Visual2D::window->clear();
-			Visual2D::window->draw(*background);
-			Visual2D::window->draw(Visual2D::biotope_map);
-			Visual2D::window->display();
-		}
-	}
+    if (Visual2D::window->isOpen())
+    {
+        if (Visual2D::window->pollEvent(Visual2D::event))
+        {
+            if (Visual2D::event.type == sf::Event::Closed) 
+            {
+                Visual2D::window->close();
+            }
+            else
+            {
+                Visual2D::window->clear();
+                Visual2D::window->draw(*background);
+                Visual2D::window->draw(Visual2D::biotope_map);
+                Visual2D::window->display();
+            }
+        }
+    }
 }
 
 /** @fn Visual2D::WindowConfigurator()
@@ -286,9 +290,9 @@ inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
     
     // Distribute the elements according to the ratio of the screen.
             
-    int x = sqrt((float) (num_of_elem) / ratio); // x * ratio = y | x * y = num_of_elem
-    int y = num_of_elem / x;
-    _total_elements = y * x;
+    float x = sqrt((float) (num_of_elem) / ratio); // x * ratio = y | x * y = num_of_elem
+    float y = (float) (num_of_elem) / x;
+    res_num_elements = (int) (y) * (int) (x);
     
     // Calculate the element size with respect to the screen resolution.
     int element_size_a = a_adjusted / x;
@@ -297,7 +301,7 @@ inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
     // Check, if the the element sizes are similar.
     float diff = abs((float)(a_adjusted / x) - (float)(b_adjusted / y)); 
     
-    if (diff > (0.1 * (float)(a_adjusted / x)) || diff > (0.1 * (float)(b_adjusted / y)))
+    if (diff > (0.1 * (float)(a_adjusted) / x) || diff > (0.1 * (float)(b_adjusted / y)))
     {
         fprintf(stdout,"\n\n+++++++++++ Something went wrong +++++++++++\n");
         fprintf(stdout,"Difference of the element size in a and b: %.3f\n", diff);
@@ -323,8 +327,8 @@ inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
             _element_size = element_size_a;
         }
         
-        _row_elements = y;
-        _column_elements = x;
+        columns = y;
+        rows = x;
     }
         
     // Control of the element size to fulfill the requirements.
@@ -337,14 +341,14 @@ inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
     }
     
     fprintf(stdout,"The edge length of one element was calculated to %i pixel on each side.\n", _element_size);
-    fprintf(stdout,"There are %i elements in the row and %i in the column. ", _row_elements, _column_elements); 
+    fprintf(stdout,"There are %i elements in the row and %i in the column. ", rows, columns); 
             
     fprintf(stdout,"In total there are %i elements in the simulation from the requested %i.\n", 
-                _total_elements, num_of_elem);
+                res_num_elements, num_of_elem);
                 
     // Calculate the resulting window size
-    Visual2D::grid_height = _column_elements * _element_size;
-    Visual2D::grid_width = _row_elements * _element_size;
+    Visual2D::grid_height = rows * _element_size;
+    Visual2D::grid_width = columns * _element_size;
     
     fprintf(stdout,"The height of the grid is %i and the width is %i Pixel.\n", Visual2D::grid_height, 
                 Visual2D::grid_width);
@@ -359,15 +363,16 @@ inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
 /** @fn Visual2D::BiotopeConfigurator()
  *  @brief Prepare the vertices of the scenery.
  *
- *  This functions creates the vertices and configures the states of each individual in the biotope.
+ *  This functions creates the vertices and configures the states of each individual in the biotope. The whole map
+ *  will be contained in a single vertex array, therefore it  will be super fast to draw.
  */
 void Visual2D::BiotopeConfigurator()
 {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;
 
-    // Creates the window and the background.
-    Visual2D::window = new sf::RenderWindow(sf::VideoMode(Visual2D::window_width, Visual2D::window_height), "Game_of_Life", sf::Style::Close, settings);
+    // Set the size and other parameter of the window.
+    Visual2D::window->create(sf::VideoMode(Visual2D::window_width, Visual2D::window_height), "Game_of_Life", sf::Style::Close, settings);
     
     // Sets the position of the window on the screen.
     Visual2D::window->setPosition(sf::Vector2i(0.5 * (desktop.width - Visual2D::window_width), 0.5 * (desktop.height - Visual2D::window_height)));
@@ -375,7 +380,7 @@ void Visual2D::BiotopeConfigurator()
     // Draw the whole scenery. (https://www.sfml-dev.org/tutorials/2.5/graphics-vertex-array.php)    
     // Create the biotope
     biotope_map.setPrimitiveType(sf::Quads);
-    biotope_map.resize(_total_elements * 4);    
+    biotope_map.resize(res_num_elements * 4);    
     
     // Start Point Width
     int spw = 0.5 * (Visual2D::window_width - Visual2D::grid_width);
@@ -388,11 +393,11 @@ void Visual2D::BiotopeConfigurator()
     int ax, bx, cx, dx, ay, by, cy, dy;
     
     // Give each individual a position and color.
-    for (int i = 0; i < _column_elements; i++)
+    for (int i = 0; i < rows; i++)
     {
-        for (int j = 0; j < _row_elements; j++)      
+        for (int j = 0; j < columns; j++)      
         {
-            particle = (j + i * _row_elements) * 4;
+            particle = (j + i * columns) * 4;
             
             ax = spw + j * _element_size;
             ay = sph + i * _element_size;
@@ -410,7 +415,7 @@ void Visual2D::BiotopeConfigurator()
             biotope_map[particle + 1].position = sf::Vector2f(bx, by);
             biotope_map[particle + 2].position = sf::Vector2f(cx, cy);
             biotope_map[particle + 3].position = sf::Vector2f(dx, dy);
-            
+
             biotope_map[particle    ].color    = sf::Color::White;
             biotope_map[particle + 1].color    = sf::Color::White;
             biotope_map[particle + 2].color    = sf::Color::White;
@@ -421,6 +426,46 @@ void Visual2D::BiotopeConfigurator()
     background->setSize(sf::Vector2f(Visual2D::window_width, Visual2D::window_height));
     background->setPosition(sf::Vector2f(0.f, 0.f));
     background->setFillColor(sf::Color(128,128,128)); // grey background
+}
+
+/** @fn Visual2D::GridUpdater()
+ *  @brief Changes the color of the individual with respect to its status.
+ *
+ *  This functions checks continuously the biotope and change the color to the status of each individual.
+ */
+void Visual2D::GridUpdater(std::vector<struct_individuals> &individuals)
+{
+    int particle = 0;
+
+    // Get an update on the status of the individuals
+    for (int i = 0; i < individuals.size(); i++)
+    {
+        // If there were changes, we manipulate the color in the grid.
+        if (individuals.at(i).change)
+        {
+            if (individuals.at(i).alive)
+            {
+                particle = i * 4;
+            
+                biotope_map[particle    ].color    = sf::Color::Black;
+                biotope_map[particle + 1].color    = sf::Color::Black;
+                biotope_map[particle + 2].color    = sf::Color::Black;
+                biotope_map[particle + 3].color    = sf::Color::Black;
+            }
+            else
+            {
+                particle = i * 4;
+            
+                biotope_map[particle    ].color    = sf::Color::White;
+                biotope_map[particle + 1].color    = sf::Color::White;
+                biotope_map[particle + 2].color    = sf::Color::White;
+                biotope_map[particle + 3].color    = sf::Color::White;
+            }
+            
+            // Set the notifier back to false.
+            individuals.at(i).change = false;
+        }
+    }
 }
 
 
