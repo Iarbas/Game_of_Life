@@ -43,7 +43,9 @@ int main (int argc, char *argv[])
 	int averge_depth_exe = 10;
 	int averge_depth_fps = 10;
 
-	float freqyency = 2;
+	float freqyency = 50;
+	read_config.get_parameter("FPS", freqyency);
+	
 	int fps_in_us = (int) round(1000000.0 / freqyency);
 
 	std::chrono::time_point<std::chrono::system_clock> fps_counter_start, fps_counter_end, execution_time_start;
@@ -60,27 +62,51 @@ int main (int argc, char *argv[])
 
 	int iter_fps_calc = 0;
 	int iter_exe_calc = 0;
+	
+        // Set the size and other parameter of the window.
+        sf::RenderWindow window(sf::VideoMode(visualization.window_width, visualization.window_height), 
+                                "Game_of_Life", sf::Style::Close);
+
+    
+        // Sets the position of the window on the screen.
+        window.setPosition(sf::Vector2i(visualization.window_posx, visualization.window_posy));
+        
+        sf::Event event;
 
 	// Loop for the visualization.
-	while (visualization.window->isOpen())
+	while (window.isOpen())
 	{
-		// Starting point of the loop. Measure the system time for FPS controlling and exact time for execution time analysis.
-		fps_counter_start = std::chrono::system_clock::now();
-		execution_time_start = std::chrono::high_resolution_clock::now();
+            // Starting point of the loop. Measure the system time for FPS controlling and exact time for execution time analysis.
+            fps_counter_start = std::chrono::system_clock::now();
+            execution_time_start = std::chrono::high_resolution_clock::now();
 
-               // Each iteration is one life cycle.
-               lifecycle.LifeRules();
+            // Each iteration is one life cycle.
+            // lifecycle.LifeRules();
+            lifecycle.RandomPatternGenerator();
 
-		// Re-draw the scenery.
-		visualization.GridUpdater(lifecycle.individuals);
-		visualization.WindowUpdater();
+            // Re-draw the scenery.
+            visualization.GridUpdater(lifecycle.individuals);
+            // visualization.WindowUpdater();
+		
+            while (window.pollEvent(event))
+            {
+                   if (event.type == sf::Event::Closed) 
+                   {
+                       window.close();
+                   }
+            }
+        
+            // Grey background
+            window.clear(sf::Color(128,128,128));
+            window.draw(visualization.biotope_map);
+            window.display();
 
-		// Calculation of the execution time average.
-		duration_array[iter_exe_calc] = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::high_resolution_clock::now() -
+            // Calculation of the execution time average.
+            duration_array[iter_exe_calc] = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::high_resolution_clock::now() -
 				execution_time_start ).count();
 
-		if (iter_exe_calc == averge_depth_exe)
-		{
+            if (iter_exe_calc == averge_depth_exe)
+            {
 			iter_exe_calc = 0;
 			duration = 0LL;
 
@@ -93,23 +119,23 @@ int main (int argc, char *argv[])
 			duration_average = (double) (duration / (double) averge_depth_exe);
 
 			fprintf(stdout,"\rAverage execution time: %.3f ms. Average FPS: %.3f", duration_average / 1000.0, fps_average);
-                        fflush(stdout);
-		}
-		else
-		{
+                       fflush(stdout);
+            }
+            else
+            {
 			iter_exe_calc++;
-		}
+            }
 
-		// Sleep function to control the frequency in the program.
-		fps_counter_end = fps_counter_start + std::chrono::microseconds(fps_in_us);
-		this_thread::sleep_until(fps_counter_end);
+            // Sleep function to control the frequency in the program.
+            fps_counter_end = fps_counter_start + std::chrono::microseconds(fps_in_us);
+            this_thread::sleep_until(fps_counter_end);
 
-		// Calculation of the FPS average. Just to check, if the "sleep_until" mechanism is working.
-		fps_array[iter_fps_calc] = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::system_clock::now() -
+            // Calculation of the FPS average. Just to check, if the "sleep_until" mechanism is working.
+            fps_array[iter_fps_calc] = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::system_clock::now() -
 				fps_counter_start ).count();
 
-		if (iter_fps_calc == averge_depth_fps)
-		{
+            if (iter_fps_calc == averge_depth_fps)
+            {
 			iter_fps_calc = 0;
 			fps = 0LL;
 
@@ -122,13 +148,13 @@ int main (int argc, char *argv[])
 			fps_average = (double) 1000000.0 / ((double) (fps / (double) averge_depth_fps));
 
 			fprintf(stdout,"\rAverage execution time: %.3f ms. Average FPS: %.3f", duration_average / 1000.0, fps_average);
-                        fflush(stdout);
-		}
-		else
-		{
+                       fflush(stdout);
+            }
+            else
+            {
 			iter_fps_calc++;
-		}
-	}
+            }
+        }
 
 	return 0;
 }

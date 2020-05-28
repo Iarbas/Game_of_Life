@@ -35,6 +35,7 @@ public:
 	ReadConfig(std::string config_file_name);
 	virtual ~ReadConfig();				// Virtual Destructor.
         void get_parameter(std::string int_value_name, int &int_value);
+        void get_parameter(std::string float_value_name, float &float_value);
         void get_parameter(std::string str_value_name, std::string &str_value);
 
 private:

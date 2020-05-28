@@ -48,12 +48,12 @@ public:
 	virtual ~LifeCycle();				// Virtual Destructor.
 	
 	void LifeRules();
+        void RandomPatternGenerator();
 	
 	std::vector<struct_individuals> individuals;
 	order_mode mode_enum;
 private:
         void Init(GameOfLife::order_mode mode);
-        void RandomPatternGenerator();
         void SinglePatternGenerator();
         
         int _elements, _rows, _columns;

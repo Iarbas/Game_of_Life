@@ -38,20 +38,20 @@ public:
         Visual2D(int number_of_elements, std::string window_form);
         virtual ~Visual2D();				// Virtual Destructor.
 
-        void WindowUpdater();
         void GridUpdater(std::vector<struct_individuals> &individuals);
 
-	/** @var sf::RenderWindow* window
-	   *  @brief Object of the open window.
-	   *
-	   *  This object represents the visual output of the class.
-	   */
-	sf::RenderWindow* window;
+	sf::VertexArray biotope_map;
 	
-	// The resultant number of elements, because of the limitation of the window size.
-	int res_num_elements;
-	int rows; 
+        // The resultant number of elements, because of the limitation of the window size.
+        int res_num_elements;
+        int rows; 
         int columns;
+        
+        uint32_t window_height;
+        uint32_t window_width;
+        
+        uint32_t window_posx;
+        uint32_t window_posy;
 
 private:
 	/** @var sf::Event event
@@ -66,9 +66,6 @@ private:
 	
 	inline int max_num_of_elem (int num_of_elem, int a, int b);
 	inline int get_element_size (int num_of_elem, int a, int b);
-
-	uint32_t window_height;
-	uint32_t window_width;
 	
 	uint32_t grid_height;
 	uint32_t grid_width;
@@ -80,10 +77,6 @@ private:
 	std::string _window_form;
 
         sf::VideoMode desktop;
-
-	sf::Event event;
-	sf::RectangleShape* background;
-	sf::VertexArray biotope_map;
 	
         // Lookup table for common screen resolution (https://en.wikipedia.org/wiki/Display_resolution).
         // Because of not unique values, we cannot use "std::map" or "std::unordered_map" here.

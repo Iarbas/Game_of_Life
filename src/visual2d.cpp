@@ -37,9 +37,11 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
     this->rows = 0; 
     this->columns = 0;
     
-    // Create the window and background
-    Visual2D::window = new sf::RenderWindow;
-    Visual2D::background = new sf::RectangleShape;
+    Visual2D::window_height = 0;
+    Visual2D::window_width = 0;
+    
+    Visual2D::window_posx = 0;
+    Visual2D::window_posy = 0;
     
     // Get screen resolution.
     desktop = sf::VideoMode().getDesktopMode();
@@ -54,8 +56,6 @@ Visual2D::Visual2D(int number_of_elements, std::string window_form)
  */
 Visual2D::~Visual2D()
 {
-    delete Visual2D::window;
-    delete Visual2D::background;
 }
 
 /** @fn Visual2D::Init()
@@ -73,38 +73,6 @@ void Visual2D::Init()
 
     // Prepare vertices or rather the biotope.
     this->BiotopeConfigurator();
-
-    // Draw the first scenery.
-    Visual2D::window->clear();
-    Visual2D::window->draw(*background);
-    Visual2D::window->draw(Visual2D::biotope_map);
-    Visual2D::window->display();
-}
-
-/** @fn Visual2D::WindowUpdater()
- *  @brief Re-draws the window with new input.
- *
- *  This functions draws continuously windows with new input from other Game_of_Life parts.
- */
-void Visual2D::WindowUpdater()
-{
-    if (Visual2D::window->isOpen())
-    {
-        if (Visual2D::window->pollEvent(Visual2D::event))
-        {
-            if (Visual2D::event.type == sf::Event::Closed) 
-            {
-                Visual2D::window->close();
-            }
-            else
-            {
-                Visual2D::window->clear();
-                Visual2D::window->draw(*background);
-                Visual2D::window->draw(Visual2D::biotope_map);
-                Visual2D::window->display();
-            }
-        }
-    }
 }
 
 /** @fn Visual2D::WindowConfigurator()
@@ -367,15 +335,10 @@ inline int Visual2D::get_element_size (int num_of_elem, int a, int b)
  *  will be contained in a single vertex array, therefore it  will be super fast to draw.
  */
 void Visual2D::BiotopeConfigurator()
-{
-    sf::ContextSettings settings;
-    settings.antialiasingLevel = 4;
-
-    // Set the size and other parameter of the window.
-    Visual2D::window->create(sf::VideoMode(Visual2D::window_width, Visual2D::window_height), "Game_of_Life", sf::Style::Close, settings);
-    
+{    
     // Sets the position of the window on the screen.
-    Visual2D::window->setPosition(sf::Vector2i(0.5 * (desktop.width - Visual2D::window_width), 0.5 * (desktop.height - Visual2D::window_height)));
+    Visual2D::window_posx = 0.5 * (desktop.width - Visual2D::window_width);
+    Visual2D::window_posy = 0.5 * (desktop.height - Visual2D::window_height);
 	
     // Draw the whole scenery. (https://www.sfml-dev.org/tutorials/2.5/graphics-vertex-array.php)    
     // Create the biotope
@@ -422,10 +385,6 @@ void Visual2D::BiotopeConfigurator()
             biotope_map[particle + 3].color    = sf::Color::White;
         }
     }
-        
-    background->setSize(sf::Vector2f(Visual2D::window_width, Visual2D::window_height));
-    background->setPosition(sf::Vector2f(0.f, 0.f));
-    background->setFillColor(sf::Color(128,128,128)); // grey background
 }
 
 /** @fn Visual2D::GridUpdater()

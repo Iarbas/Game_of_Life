@@ -250,6 +250,37 @@ void ReadConfig::get_parameter(std::string int_value_name, int &int_value)
     return;
 }
 
+void ReadConfig::get_parameter(std::string float_value_name, float &float_value)
+{
+    int result = -1;
+
+    if(!this->data_size_tested) this->check_data_size();
+
+    if (this->data_size_ok)
+    {
+        for (int i = 0; i < this->raw_config.size(); i=i+2)
+        {
+            result = this->raw_config.at(i).compare(float_value_name);
+
+            if (result == 0)
+            {
+                float_value = std::stoi(this->raw_config.at(i+1));
+
+                std::cout << "Parameter for " << float_value_name.c_str() << " is: " << float_value << std::endl; 
+
+                return;
+            }
+        }
+    }
+
+    if (result != 0)
+    {
+        std::cout << "Could not find the parameter for " << float_value_name.c_str() << ". Using instead the initial value " << float_value << std::endl; 
+    }
+
+    return;
+}
+
 void ReadConfig::get_parameter(std::string str_value_name, std::string &str_value)
 {
     int result = -1;

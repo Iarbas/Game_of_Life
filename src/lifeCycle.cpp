@@ -96,13 +96,19 @@ void LifeCycle::RandomPatternGenerator()
         // Otherwise, it will be dead.
         if (rand() % 101 < live_rate)
         {
-            LifeCycle::individuals.at(i).alive = true;
-            LifeCycle::individuals.at(i).change = true;
+            if(!LifeCycle::individuals.at(i).alive)
+            {
+                LifeCycle::individuals.at(i).change = true;
+                LifeCycle::individuals.at(i).alive = true;
+            }
         }
         else
         {
-            LifeCycle::individuals.at(i).alive = false;
-            LifeCycle::individuals.at(i).change = false;
+            if(LifeCycle::individuals.at(i).alive)
+            {
+                LifeCycle::individuals.at(i).change = true;
+                LifeCycle::individuals.at(i).alive = false;
+            }
         }   
     }
 }
