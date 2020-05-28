@@ -402,19 +402,17 @@ void Visual2D::GridUpdater(std::vector<struct_individuals> &individuals)
         // If there were changes, we manipulate the color in the grid.
         if (individuals.at(i).change)
         {
+            particle = i * 4;
+        
             if (individuals.at(i).alive)
             {
-                particle = i * 4;
-            
                 biotope_map[particle    ].color    = sf::Color::Black;
                 biotope_map[particle + 1].color    = sf::Color::Black;
                 biotope_map[particle + 2].color    = sf::Color::Black;
                 biotope_map[particle + 3].color    = sf::Color::Black;
             }
             else
-            {
-                particle = i * 4;
-            
+            {            
                 biotope_map[particle    ].color    = sf::Color::White;
                 biotope_map[particle + 1].color    = sf::Color::White;
                 biotope_map[particle + 2].color    = sf::Color::White;

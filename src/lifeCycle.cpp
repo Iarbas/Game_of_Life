@@ -38,6 +38,9 @@ LifeCycle::LifeCycle(int rows, int columns, int number_of_elements, std::string 
     mode_enum = order_mode::random;
     LifeCycle::individuals.resize(number_of_elements);
     
+    // initialize random seed
+    seed = time(NULL);
+    
     static std::unordered_map<std::string, order_mode> const table = 
         { {"random", order_mode::random}, 
         {"test_pattern",order_mode::test_pattern} };
@@ -84,7 +87,7 @@ void LifeCycle::Init(GameOfLife::order_mode mode)
 void LifeCycle::RandomPatternGenerator()
 {
     // initialize random seed
-    srand (time(NULL));
+    srand (seed);
     
     for (int i = 0; i < LifeCycle::individuals.size(); i++)
     {
@@ -111,6 +114,8 @@ void LifeCycle::RandomPatternGenerator()
             }
         }   
     }
+    
+    seed = rand();
 }
 
 void LifeCycle::SinglePatternGenerator()

@@ -57,6 +57,7 @@ private:
         void SinglePatternGenerator();
         
         int _elements, _rows, _columns;
+        unsigned seed;
 };
 
 }

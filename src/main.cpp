@@ -81,12 +81,11 @@ int main (int argc, char *argv[])
             execution_time_start = std::chrono::high_resolution_clock::now();
 
             // Each iteration is one life cycle.
-            // lifecycle.LifeRules();
-            lifecycle.RandomPatternGenerator();
+            lifecycle.LifeRules();
+            // lifecycle.RandomPatternGenerator();
 
             // Re-draw the scenery.
             visualization.GridUpdater(lifecycle.individuals);
-            // visualization.WindowUpdater();
 		
             while (window.pollEvent(event))
             {
