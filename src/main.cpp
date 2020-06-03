@@ -9,6 +9,8 @@
 #include "visual2d.hpp"
 #include "lifeCycle.hpp"
 
+#include <unistd.h>
+
 
 using namespace std;
 
@@ -72,7 +74,17 @@ int main (int argc, char *argv[])
         window.setPosition(sf::Vector2i(visualization.window_posx, visualization.window_posy));
         
         sf::Event event;
-
+                
+        bool initialization = true;
+        
+        // For saving the window content to a file.
+        /*sf::Vector2u windowSize = window.getSize();
+        sf::Texture texture;
+        texture.create(windowSize.x, windowSize.y);
+        sf::Image screenshot;
+        std::string folder_for_images= "";
+        int iter = 0;*/
+                 
 	// Loop for the visualization.
 	while (window.isOpen())
 	{
@@ -80,9 +92,15 @@ int main (int argc, char *argv[])
             fps_counter_start = std::chrono::system_clock::now();
             execution_time_start = std::chrono::high_resolution_clock::now();
 
-            // Each iteration is one life cycle.
-            lifecycle.LifeRules();
-            // lifecycle.RandomPatternGenerator();
+            // Each iteration is one life cycle, but not in the first iteration.
+            if (!initialization)
+            {
+                lifecycle.LifeRules();
+            }
+            else
+            {
+                initialization = false;
+            }
 
             // Re-draw the scenery.
             visualization.GridUpdater(lifecycle.individuals);
@@ -99,6 +117,12 @@ int main (int argc, char *argv[])
             window.clear(sf::Color(128,128,128));
             window.draw(visualization.biotope_map);
             window.display();
+            
+            // Save the window content to a file.
+            /*iter++;
+            folder_for_images = "a_seperate_folder/" + std::to_string(iter) + ".png";
+            texture.update(window);
+            texture.copyToImage().saveToFile(folder_for_images);*/
 
             // Calculation of the execution time average.
             duration_array[iter_exe_calc] = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::high_resolution_clock::now() -

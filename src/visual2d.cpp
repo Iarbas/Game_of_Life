@@ -400,7 +400,8 @@ void Visual2D::GridUpdater(std::vector<struct_individuals> &individuals)
     for (int i = 0; i < individuals.size(); i++)
     {
         // If there were changes, we manipulate the color in the grid.
-        if (individuals.at(i).change)
+        // if (individuals.at(i).change)
+        if (true)
         {
             particle = i * 4;
         

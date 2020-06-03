@@ -27,6 +27,7 @@ namespace GameOfLife
     struct struct_individuals
     {
         bool change, alive;
+        int living_neighbours;
     };
 
     enum order_mode

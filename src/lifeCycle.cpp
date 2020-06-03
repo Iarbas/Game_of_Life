@@ -130,7 +130,7 @@ void LifeCycle::LifeRules()
     int living_neighbours;
     
     // Make a copy of the structure.
-    std::vector<struct_individuals> copy_of_individuals = LifeCycle::individuals;
+    std::vector<struct_individuals> copy_of_individuals(LifeCycle::individuals);
 
     // Iterate through all the individuals.
     for (int i = 0; i < LifeCycle::individuals.size(); i++)
@@ -148,23 +148,23 @@ void LifeCycle::LifeRules()
         // If the individual is not located at the upper and left border, there is a neighbour.
         if (i > (_columns - 1) && i % _columns != 0)
         {
-            one = i - _rows - 1;
+            one = i - _columns - 1;
                     
             if (LifeCycle::individuals.at(one).alive)
             {
                 living_neighbours++;
             }
         }
-        
+      
         // ---- 2 ----
         // If the individual is not located at the upper border, there is a neighbour.
         if (i > (_columns - 1))
         {
-            two = i - _rows;
+            two = i - _columns;
                     
             if (LifeCycle::individuals.at(two).alive)
             {
-                living_neighbours++;
+                living_neighbours++;               
             }
         }
         
@@ -172,7 +172,7 @@ void LifeCycle::LifeRules()
         // If the individual is not located at the upper and right border, there is a neighbour.
         if (i > (_columns - 1) && (i + 1) % _columns != 0)
         {
-            three = i - _rows + 1;
+            three = i - _columns + 1;
                     
             if (LifeCycle::individuals.at(three).alive)
             {
@@ -188,7 +188,7 @@ void LifeCycle::LifeRules()
                         
             if (LifeCycle::individuals.at(four).alive)
             {
-                living_neighbours++;
+                living_neighbours++; 
             }
         }
         
@@ -208,7 +208,7 @@ void LifeCycle::LifeRules()
         // If the individual is not located at the lower and left border, there is a neighbour.
         if (i < (_columns * (_rows - 1)) && i % _columns != 0)
         {
-            six = i + _rows - 1;
+            six = i + _columns - 1;
                         
             if (LifeCycle::individuals.at(six).alive)
             {
@@ -220,7 +220,7 @@ void LifeCycle::LifeRules()
         // If the individual is not located at the lower border, there is a neighbour.
         if (i < (_columns * (_rows - 1)))
         {
-            seven = i + _rows;
+            seven = i + _columns;
                         
             if (LifeCycle::individuals.at(seven).alive)
             {
@@ -232,7 +232,7 @@ void LifeCycle::LifeRules()
         // If the individual is not located at the lower and right border, there is a neighbour.
         if (i < (_columns * (_rows - 1)) && (i + 1) % _columns != 0)
         {
-            eight = i + _rows + 1;
+            eight = i + _columns + 1;
                         
             if (LifeCycle::individuals.at(eight).alive)
             {
@@ -257,6 +257,8 @@ void LifeCycle::LifeRules()
             copy_of_individuals.at(i).change = true;
             copy_of_individuals.at(i).alive = false;
         }
+        
+        copy_of_individuals.at(i).living_neighbours = living_neighbours;
     }
     
     // Copy back.

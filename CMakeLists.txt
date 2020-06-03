@@ -20,19 +20,23 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_REQUIRED_FLAGS -std=c++17 -lstdc++fs)
 
 # The version number.
-set (GAME_VERSION_MAJOR 0)
-set (GAME_VERSION_MINOR 1)
+set (GAME_VERSION_MAJOR 1)
+set (GAME_VERSION_MINOR 0)
 
 # Standard directory for the config files.
 set (CONFIG_DIRECTORY ${PARENT_DIR}/build/configs)
 
-# Create the additional folders to organize the configs in a better way.
+# Standard directory for the etc files.
+set (ETC_DIRECTORY ${PARENT_DIR}/build/etc)
+
+# Create the additional folders to organize the configs and etc in a better way.
 add_custom_target(create_folders)
 
 add_custom_command(
         TARGET create_folders PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_HEADERS_OUTPUT_DIRECTORY}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CONFIG_DIRECTORY})
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CONFIG_DIRECTORY}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${ETC_DIRECTORY})
 
 # This command and the FindSFML.cmake file in cmake_modules is needed to find SFML.
 # message(STATUS "CMAKE_MODULE_PATH: " ${CMAKE_CURRENT_LIST_DIR})
@@ -58,7 +62,7 @@ target_link_libraries(${PROJECT_NAME}
     Config_Reader
     )
 
-add_dependencies( ${PROJECT_NAME} copy_config Config_Reader)
+add_dependencies( ${PROJECT_NAME} copy_config_etc Config_Reader)
 
 # %%%%%%% Library %%%%%%%
 # Create a static library.
@@ -76,11 +80,12 @@ add_custom_command(
         TARGET copy_headers_reader PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy include/readConfig.hpp ${CMAKE_HEADERS_OUTPUT_DIRECTORY}/)
         
-# Copy the config file and circuit files in the projects own file managment. 
-add_custom_target(copy_config)
-add_dependencies( copy_config create_folders )
+# Copy the config and etc files files in the projects own file managment. 
+add_custom_target(copy_config_etc)
+add_dependencies( copy_config_etc create_folders )
 
 add_custom_command(
-        TARGET copy_config PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_LIST_DIR}/config/sim.config ${CONFIG_DIRECTORY}/sim.config)
+        TARGET copy_config_etc PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_LIST_DIR}/config/sim.config ${CONFIG_DIRECTORY}/sim.config
+        COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_LIST_DIR}/etc/sansation.ttf ${ETC_DIRECTORY}/sansation.ttf)
 
