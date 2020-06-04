@@ -28,12 +28,14 @@ namespace GameOfLife
  *  @brief Constructor of the class LifeCycle.
  *
  */
-LifeCycle::LifeCycle(int rows, int columns, int number_of_elements, std::string mode, std::string pattern)
+LifeCycle::LifeCycle(int rows, int columns, int number_of_elements, std::string mode, std::string pattern, 
+                     int live_rate)
 {
     // Initialize variables
     this->_rows = rows;
     this->_columns= columns;
     this->_elements = number_of_elements;
+    this->_live_rate = live_rate;                   // % of living individuals. Only usable with random placement mode.
     
     mode_enum = order_mode::random;
     LifeCycle::individuals.resize(number_of_elements);
@@ -43,7 +45,8 @@ LifeCycle::LifeCycle(int rows, int columns, int number_of_elements, std::string 
     
     static std::unordered_map<std::string, order_mode> const table = 
         { {"random", order_mode::random}, 
-        {"test_pattern",order_mode::test_pattern} };
+        {"test_pattern",order_mode::test_pattern},
+        {"empty", order_mode::empty} };
         
     auto it = table.find(mode);
     
@@ -54,7 +57,8 @@ LifeCycle::LifeCycle(int rows, int columns, int number_of_elements, std::string 
     } 
     else 
     {  
-        fprintf(stdout,"Cannot find the mode: %s. The program will continue with random pattern\n", mode.c_str());
+        mode_enum = order_mode::empty;
+        fprintf(stdout,"Cannot find the mode: %s. The program will continue with empty pattern.\n", mode.c_str());
     }
     
     this->Init(mode_enum);
@@ -79,25 +83,25 @@ void LifeCycle::Init(GameOfLife::order_mode mode)
         case order_mode::test_pattern :
             this->SinglePatternGenerator();
             break;
+        case order_mode::empty :
+            this->EmptyPatternGenerator();
+            break;
         default:
+            this->EmptyPatternGenerator();
             break;
     }
 }
 
 void LifeCycle::RandomPatternGenerator()
 {
-    // initialize random seed
+    // Initialize random seed
     srand (seed);
     
     for (int i = 0; i < LifeCycle::individuals.size(); i++)
-    {
-        // percentage of living individuals.
-        // TODO: In config file
-        int live_rate = 30;
-    
+    {    
         // Decision of life and death. If the random number is bigger than a certain number, the individual will live.
         // Otherwise, it will be dead.
-        if (rand() % 101 < live_rate)
+        if (rand() % 101 < this->_live_rate)
         {
             if(!LifeCycle::individuals.at(i).alive)
             {
@@ -121,6 +125,15 @@ void LifeCycle::RandomPatternGenerator()
 void LifeCycle::SinglePatternGenerator()
 {
 
+}
+
+void LifeCycle::EmptyPatternGenerator()
+{
+    for (int i = 0; i < LifeCycle::individuals.size(); i++)
+    {    
+        LifeCycle::individuals.at(i).change = false;
+        LifeCycle::individuals.at(i).alive = false;  
+    }
 }
 
 void LifeCycle::LifeRules()

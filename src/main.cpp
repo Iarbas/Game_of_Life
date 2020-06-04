@@ -28,17 +28,21 @@ int main (int argc, char *argv[])
 	GameOfLife::ReadConfig read_config(help_string);
 
         int number_of_elements = 100;
+        int live_rate = 10;
         std::string window_form = "square";
+        std::string initial_placement = "empty";
 
         read_config.get_parameter("number_of_elements", number_of_elements);
         read_config.get_parameter("window_form", window_form);
+        read_config.get_parameter("initial_placement", initial_placement);
+        read_config.get_parameter("live_rate", live_rate);
 
 	// Starting the 2D visualization.
 	GameOfLife::Visual2D visualization(number_of_elements, window_form);
 	
 	// Start the Cycle of Life.
         GameOfLife::LifeCycle lifecycle(visualization.rows, visualization.columns, 
-                                        visualization.res_num_elements, "random", " ");
+                                        visualization.res_num_elements, initial_placement, " ", live_rate);
 
 	// Frequency control and execution time calculation.
 	// Parameter. This will go into the configuration file later.

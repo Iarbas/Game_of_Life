@@ -33,7 +33,8 @@ namespace GameOfLife
     enum order_mode
     {
         random, 
-        test_pattern
+        test_pattern,
+        empty
     };
 
 /** @class LifeCycle
@@ -45,19 +46,20 @@ namespace GameOfLife
 class LifeCycle
 {
 public:
-	LifeCycle(int rows, int columns, int number_of_elements, std::string mode, std::string pattern);
+	LifeCycle(int rows, int columns, int number_of_elements, std::string mode, std::string pattern, int live_rate);
 	virtual ~LifeCycle();				// Virtual Destructor.
 	
 	void LifeRules();
         void RandomPatternGenerator();
+        void SinglePatternGenerator();
+        void EmptyPatternGenerator();
 	
 	std::vector<struct_individuals> individuals;
 	order_mode mode_enum;
 private:
         void Init(GameOfLife::order_mode mode);
-        void SinglePatternGenerator();
         
-        int _elements, _rows, _columns;
+        int _elements, _rows, _columns, _live_rate;
         unsigned seed;
 };
 

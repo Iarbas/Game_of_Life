@@ -244,7 +244,7 @@ void ReadConfig::get_parameter(std::string int_value_name, int &int_value)
 
     if (result != 0)
     {
-        std::cout << "Could not find the parameter for " << int_value_name.c_str() << ". Using instead the initial value " << int_value << std::endl; 
+        std::cout << "Could not find the parameter for " << int_value_name.c_str() << ". Using instead the initial value: " << int_value << std::endl; 
     }
 
     return;
@@ -275,7 +275,7 @@ void ReadConfig::get_parameter(std::string float_value_name, float &float_value)
 
     if (result != 0)
     {
-        std::cout << "Could not find the parameter for " << float_value_name.c_str() << ". Using instead the initial value " << float_value << std::endl; 
+        std::cout << "Could not find the parameter for " << float_value_name.c_str() << ". Using instead the initial value: " << float_value << std::endl; 
     }
 
     return;
@@ -306,7 +306,7 @@ void ReadConfig::get_parameter(std::string str_value_name, std::string &str_valu
 
     if (result != 0)
     {
-        std::cout << "Could not find the parameter for " << str_value_name.c_str() << ". Using instead the initial value " << str_value << std::endl; 
+        std::cout << "Could not find the parameter for " << str_value_name.c_str() << ". Using instead the initial value: " << str_value << std::endl; 
     }
 
     return;
