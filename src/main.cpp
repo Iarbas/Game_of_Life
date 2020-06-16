@@ -8,6 +8,7 @@
 #include "readConfig.hpp"
 #include "visual2d.hpp"
 #include "lifeCycle.hpp"
+#include "python_wrapper.hpp"
 
 #include <unistd.h>
 
@@ -76,6 +77,9 @@ int main (int argc, char *argv[])
     
         // Sets the position of the window on the screen.
         window.setPosition(sf::Vector2i(visualization.window_posx, visualization.window_posy));
+        
+        // Call the Python wrapper method to plot some statistics.
+        GameOfLife::PythonWrapper pythonwrapper(8);
         
         sf::Event event;
                 

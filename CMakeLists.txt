@@ -44,21 +44,24 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_modules" ${CMAKE_MODULE_P
 
 find_package(OpenGL)
 find_package(SFML 2 REQUIRED COMPONENTS graphics window system )
+find_package (PythonLibs REQUIRED)
 
 # Configure a header file to pass some of the CMake settings to the source code
 configure_file ( src/cmake_config.h.in ${CMAKE_HEADERS_OUTPUT_DIRECTORY}/cmake_config.h ) 
 
 # ----------------------------------------------- Program Configuration -----------------------------------------------
 include_directories(include
-                    ${CMAKE_HEADERS_OUTPUT_DIRECTORY})
+                    ${CMAKE_HEADERS_OUTPUT_DIRECTORY}
+                    ${PYTHON_INCLUDE_DIRS})
 
 # %%%%%%% Executable %%%%%%%
-add_executable(${PROJECT_NAME} src/main.cpp src/visual2d.cpp src/lifeCycle.cpp )
+add_executable(${PROJECT_NAME} src/main.cpp src/visual2d.cpp src/lifeCycle.cpp src/python_wrapper.cpp)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 target_link_libraries(${PROJECT_NAME}
     ${SFML_LIBRARIES} 
     ${SFML_DEPENDENCIES}
+    ${PYTHON_LIBRARIES}
     Config_Reader
     )
 
