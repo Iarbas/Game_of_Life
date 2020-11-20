@@ -26,7 +26,7 @@ int main (int argc, char *argv[])
         help_string.append("/sim.config");
 
 	// Read the configuration file and get the parameter.
-	GameOfLife::ReadConfig read_config(help_string);
+	SPFR::ReadConfig read_config(help_string);
 
         int number_of_elements = 100;
         int live_rate = 10;
